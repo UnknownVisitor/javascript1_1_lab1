@@ -35,15 +35,15 @@
     }
 
     // 2. Zawieranie liter (wielkich lub małych)
-    // Używanie wyrażenia regularnego: /.*[a-zA-Z].*/ sprawdza, czy w tekście jest         cokolwiek, co jest literą.
+    // Używanie wyrażenia regularnego: /.*[a-zA-Z].*/ sprawdza, czy w tekście jest cokolwiek, co jest literą.
     if (/[a-zA-Z]/.test(text)) {
       return 'Numer nie może zawierać liter';
     }
 
     // 3. Zawieranie znaków specjalnych
     // Sprawdzanie, czy tekst zawiera cokolwiek poza cyframi (0-9).
-    // Jeśli nie zawiera liter (sprawdzone wyżej), to to wyrażenie regularne              znajdzie znaki specjalne.
-    // Używanie wyrażenia regularnego: /[^\d]/ testuje, czy w tekście jest                 cokolwiek, co nie jest cyfrą.
+    // Jeśli nie zawiera liter (sprawdzone wyżej), to to wyrażenie regularne znajdzie znaki specjalne.
+    // Używanie wyrażenia regularnego: /[^\d]/ testuje, czy w tekście jest cokolwiek, co nie jest cyfrą.
     if (/\D/.test(text)) {
       return 'Numer nie może zawierać znaków specjalnych';
     }
@@ -63,7 +63,7 @@
   });
 
 
-  // Com1_2.1 & Com1_2.2 - Drag&Drop pomiędzy kontenerami w obie strony.
+  // Com1_2.1 - Przeciąganie jednostronne (ex3_one -> ex3_two)
 
   // 1. Definicja elementów
   const draggableElement = document.getElementById('ex3_element');
@@ -94,8 +94,6 @@
 
   // 3. Funkcja obsługująca przeciąganie nad kontenerem (dragover)
   function handleDragOver(event) {
-      // Domyślnie elementy nie akceptują upuszczania.
-      // Musimy wywołać event.preventDefault(), aby umożliwić upuszczenie.
       event.preventDefault();
       event.dataTransfer.dropEffect = 'move';
   }
@@ -109,31 +107,23 @@
       const data = event.dataTransfer.getData('text/plain');
       const draggedElement = document.getElementById(data);
 
-      // Sprawdzanie, czy cel upuszczenia nie jest samym przeciąganym elementem
-      // i czy element przeciągany istnieje.
-      if (draggedElement && (event.target.contains(dropContainerOne) || event.target.contains(dropContainerTwo) || event.target.id === 'ex3_one' || event.target.id === 'ex3_two')) {
-          // Używanie najbliższego kontenera jako celu upuszczenia
-          let dropTarget = event.target;
-          while (dropTarget && dropTarget.id !== 'ex3_one' && dropTarget.id !== 'ex3_two' && dropTarget.parentElement) {
-              dropTarget = dropTarget.parentElement;
-          }
-
-          if (dropTarget) {
-              // Przenoszenie przeciąganego elementu do nowego kontenera
-              dropTarget.appendChild(draggedElement);
-          }
+      // Znajdowanie docelowego kontenera upuszczenia
+      let dropTarget = event.target;
+      while (dropTarget && dropTarget.id !== 'ex3_one' && dropTarget.id !== 'ex3_two' && dropTarget.parentElement) {
+          dropTarget = dropTarget.parentElement;
       }
+
+      // WARUNEK DLA PRZECIĄGANIA JEDNOSTRONNEGO:
+      // Sprawdzanie, czy element jest upuszczany TYLKO do kontenera ex3_two.
+      if (draggedElement && dropTarget && dropTarget.id === 'ex3_two') {
+          // Przenoszenie przeciąganego elementu do nowego kontenera
+          dropTarget.appendChild(draggedElement);
+      }
+
   }
-
-
-  // 5. Dodawanie Listenerów do obu kontenerów, aby działały jako cele upuszczania
-
+  
+  // 5. Dodawanie Listenerów - akceptowanie upuszczenia tylko przez ex3_two
   if (dropContainerOne && dropContainerTwo) {
-      // Kontener ex3_one
-      dropContainerOne.addEventListener('dragover', handleDragOver);
-      dropContainerOne.addEventListener('drop', handleDrop);
-
-      // Kontener ex3_two
       dropContainerTwo.addEventListener('dragover', handleDragOver);
       dropContainerTwo.addEventListener('drop', handleDrop);
   }
