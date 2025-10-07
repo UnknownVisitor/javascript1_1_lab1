@@ -1,6 +1,6 @@
 (function () {
-  //Com1_1.1 
-  
+  // Com1_1.1
+
   // ex1_button.
   const button = document.getElementById('ex1_button');
   const contentDiv = document.getElementById('ex1_content');
@@ -15,18 +15,18 @@
     }
     return result;
   }
-  // Dodaj zdarzenie po przyciśnięciu przycisku ex1_button.
+  // Dodawanie zdarzenia po przyciśnięciu przycisku ex1_button.
   button.addEventListener('click', function() {
-    // Wygeneruj ciąg liczb jako wartość div
+    // Generowanie ciągu liczb jako wartość div
     contentDiv.textContent = generateNumberString();
   });
 
   const phoneInput = document.getElementById('ex2_text');
   const validationContent = document.getElementById('ex2_content');
 
-  
-  //Com1_1.2
-  
+
+  // Com1_1.2
+
   // Funkcja sprawdzająca poprawność numeru telefonu
   function validatePhoneNumber(text) {
     // 1. Długość nierówna 9
@@ -34,16 +34,16 @@
       return 'Długość numeru musi być równa 9';
     }
 
-    // 2. Zawiera litery (wielkie lub małe)
-    // Używamy wyrażenia regularnego: /.*[a-zA-Z].*/ sprawdza, czy w tekście jest        cokolwiek, co jest literą.
+    // 2. Zawieranie liter (wielkich lub małych)
+    // Używanie wyrażenia regularnego: /.*[a-zA-Z].*/ sprawdza, czy w tekście jest         cokolwiek, co jest literą.
     if (/[a-zA-Z]/.test(text)) {
       return 'Numer nie może zawierać liter';
     }
 
-    // 3. Zawiera znaki specjalne
-    // Sprawdzamy, czy tekst zawiera cokolwiek poza cyframi (0-9).
-    // Jeśli nie zawiera liter (sprawdzone wyżej), to to wyrażenie regularne             znajdzie znaki specjalne.
-    // Używamy wyrażenia regularnego: /[^\d]/ testuje, czy w tekście jest                cokolwiek, co nie jest cyfrą.
+    // 3. Zawieranie znaków specjalnych
+    // Sprawdzanie, czy tekst zawiera cokolwiek poza cyframi (0-9).
+    // Jeśli nie zawiera liter (sprawdzone wyżej), to to wyrażenie regularne              znajdzie znaki specjalne.
+    // Używanie wyrażenia regularnego: /[^\d]/ testuje, czy w tekście jest                 cokolwiek, co nie jest cyfrą.
     if (/\D/.test(text)) {
       return 'Numer nie może zawierać znaków specjalnych';
     }
@@ -53,13 +53,89 @@
     return 'Numer telefonu jest poprawny';
   }
 
-  // Dodaj zdarzenie reagujące na zmianę treści (input)
+  // Dodawanie zdarzenia reagującego na zmianę treści (input)
   phoneInput.addEventListener('input', function(event) {
     const inputText = event.target.value;
     const message = validatePhoneNumber(inputText);
 
-    // Wyświetl komunikat w elemencie o ID: ex2_content
+    // Wyświetlanie komunikatu w elemencie o ID: ex2_content
     validationContent.textContent = message;
   });
+
+
+  // Com1_2.1 & Com1_2.2 - Drag&Drop pomiędzy kontenerami w obie strony.
+
+  // 1. Definicja elementów
+  const draggableElement = document.getElementById('ex3_element');
+  const dropContainerOne = document.getElementById('ex3_one');
+  const dropContainerTwo = document.getElementById('ex3_two');
+
+  // 2. Obsługa zdarzenia dragstart na elemencie przeciąganym
+  if (draggableElement) {
+      // Ustawianie atrybutu draggable="true"
+      draggableElement.draggable = true;
+
+      draggableElement.addEventListener('dragstart', function(event) {
+          // Zapisywanie ID przeciąganego elementu w obiekcie DataTransfer.
+          event.dataTransfer.setData('text/plain', event.target.id);
+
+          // Zmniejszanie przezroczystości przeciąganego elementu
+          // dla wizualnej informacji zwrotnej.
+          setTimeout(() => {
+              event.target.style.opacity = '0.4';
+          }, 0);
+      });
+
+      draggableElement.addEventListener('dragend', function(event) {
+          // Przywracanie pełnej przezroczystości, gdy przeciąganie się zakończy.
+          event.target.style.opacity = '1';
+      });
+  }
+
+  // 3. Funkcja obsługująca przeciąganie nad kontenerem (dragover)
+  function handleDragOver(event) {
+      // Domyślnie elementy nie akceptują upuszczania.
+      // Musimy wywołać event.preventDefault(), aby umożliwić upuszczenie.
+      event.preventDefault();
+      event.dataTransfer.dropEffect = 'move';
+  }
+
+  // 4. Funkcja obsługująca upuszczenie elementu (drop)
+  function handleDrop(event) {
+      // Zatrzymywanie domyślnego zachowania przeglądarki (np. otwarcie pliku).
+      event.preventDefault();
+
+      // Pobieranie danych (ID elementu) zapisanych podczas dragstart
+      const data = event.dataTransfer.getData('text/plain');
+      const draggedElement = document.getElementById(data);
+
+      // Sprawdzanie, czy cel upuszczenia nie jest samym przeciąganym elementem
+      // i czy element przeciągany istnieje.
+      if (draggedElement && (event.target.contains(dropContainerOne) || event.target.contains(dropContainerTwo) || event.target.id === 'ex3_one' || event.target.id === 'ex3_two')) {
+          // Używanie najbliższego kontenera jako celu upuszczenia
+          let dropTarget = event.target;
+          while (dropTarget && dropTarget.id !== 'ex3_one' && dropTarget.id !== 'ex3_two' && dropTarget.parentElement) {
+              dropTarget = dropTarget.parentElement;
+          }
+
+          if (dropTarget) {
+              // Przenoszenie przeciąganego elementu do nowego kontenera
+              dropTarget.appendChild(draggedElement);
+          }
+      }
+  }
+
+
+  // 5. Dodawanie Listenerów do obu kontenerów, aby działały jako cele upuszczania
+
+  if (dropContainerOne && dropContainerTwo) {
+      // Kontener ex3_one
+      dropContainerOne.addEventListener('dragover', handleDragOver);
+      dropContainerOne.addEventListener('drop', handleDrop);
+
+      // Kontener ex3_two
+      dropContainerTwo.addEventListener('dragover', handleDragOver);
+      dropContainerTwo.addEventListener('drop', handleDrop);
+  }
 
 })();
