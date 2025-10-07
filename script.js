@@ -63,7 +63,7 @@
   });
 
 
-  // Com1_2.1 - Przeciąganie jednostronne (ex3_one -> ex3_two)
+  // Com1_2.2 - Przeciąganie w obie strony (Drag&Drop pomiędzy kontenerami w obie strony)
 
   // 1. Definicja elementów
   const draggableElement = document.getElementById('ex3_element');
@@ -94,6 +94,7 @@
 
   // 3. Funkcja obsługująca przeciąganie nad kontenerem (dragover)
   function handleDragOver(event) {
+      // Włączanie możliwości upuszczenia.
       event.preventDefault();
       event.dataTransfer.dropEffect = 'move';
   }
@@ -113,17 +114,20 @@
           dropTarget = dropTarget.parentElement;
       }
 
-      // WARUNEK DLA PRZECIĄGANIA JEDNOSTRONNEGO:
-      // Sprawdzanie, czy element jest upuszczany TYLKO do kontenera ex3_two.
-      if (draggedElement && dropTarget && dropTarget.id === 'ex3_two') {
+      // WARUNEK DLA PRZECIĄGANIA W OBIE STRONY:
+      if (draggedElement && dropTarget && (dropTarget.id === 'ex3_one' || dropTarget.id === 'ex3_two')) {
           // Przenoszenie przeciąganego elementu do nowego kontenera
           dropTarget.appendChild(draggedElement);
       }
-
   }
-  
-  // 5. Dodawanie Listenerów - akceptowanie upuszczenia tylko przez ex3_two
+
+  // 5. Dodawanie Listenerów - akceptowanie upuszczenia przez OBA kontenery
   if (dropContainerOne && dropContainerTwo) {
+      // Kontener ex3_one: Przywracanie pełnego nasłuchu
+      dropContainerOne.addEventListener('dragover', handleDragOver);
+      dropContainerOne.addEventListener('drop', handleDrop);
+
+      // Kontener ex3_two: Akceptowanie upuszczenia
       dropContainerTwo.addEventListener('dragover', handleDragOver);
       dropContainerTwo.addEventListener('drop', handleDrop);
   }
